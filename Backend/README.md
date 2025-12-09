@@ -91,3 +91,71 @@ Example 500 response:
 - On successful registration a JWT is issued. The secret is read from `process.env.JWT_SECRET` and the token expires in 7 days.
 
 ---
+
+## Authentication — /auth/login
+
+This endpoint allows an existing user to log in and receive a JSON Web Token.
+
+### Endpoint
+
+- **URL**: `/auth/login`
+- **Method**: POST
+
+### Request body (JSON)
+
+The login endpoint expects the following JSON payload:
+
+- `email` (string) — required. Must be a valid email address.
+- `password` (string) — required. Minimum 6 characters.
+
+Example request:
+
+```json
+{
+  "email": "jane.doe@example.com",
+  "password": "correcthorsebattery"
+}
+```
+
+### Validation
+
+- `email` — validated with `isEmail()`.
+- `password` — validated with `isLength({ min: 6 })`.
+
+If validation fails the endpoint returns a 400 status and the `errors` array from `express-validator`.
+
+### Responses
+
+- **200 OK** — login successful. Returns an auth token and the user object (password is not included).
+
+Example 200 response:
+
+```json
+{
+  "token": "<jwt-token>",
+  "user": {
+    "_id": "634e9b...",
+    "firstname": "Jane",
+    "lastname": "Doe",
+    "email": "jane.doe@example.com",
+    "socketId": null,
+    "__v": 0
+  }
+}
+```
+
+- **400 Bad Request** — validation errors (see examples above).
+
+- **401 Unauthorized** — invalid credentials (either email not found or password mismatch). Example response:
+
+```json
+{ "message": "Invalid Credentials" }
+```
+
+- **500 Internal Server Error** — unexpected server/database error.
+
+### Notes
+
+- The server validates the credentials by looking up the user by email and comparing the supplied password with the stored hashed password.
+- On success, a JWT is created and returned. Keep the token secure on the client and use it in Authorization headers for protected routes.
+
