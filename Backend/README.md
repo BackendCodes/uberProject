@@ -159,3 +159,66 @@ Example 200 response:
 - The server validates the credentials by looking up the user by email and comparing the supplied password with the stored hashed password.
 - On success, a JWT is created and returned. Keep the token secure on the client and use it in Authorization headers for protected routes.
 
+## Authentication — /auth/profile (protected)
+
+Fetches the currently authenticated user's profile. This endpoint is protected and requires a valid token.
+
+### Endpoint
+
+- **URL**: `/auth/profile`
+- **Method**: GET
+
+### Authentication
+
+The endpoint requires a valid JWT. The middleware accepts the token in either:
+
+- A cookie named `token` (httpOnly), or
+- An `Authorization` header: `Authorization: Bearer <token>`
+
+If the token is missing or invalid the server returns 401 Unauthorized.
+
+### Responses
+
+- **200 OK** — returns the current user's public profile (password excluded).
+
+Example 200 response:
+
+```json
+{
+  "user": {
+    "_id": "634e9b...",
+    "firstname": "Jane",
+    "lastname": "Doe",
+    "email": "jane.doe@example.com",
+    "socketId": null,
+    "__v": 0
+  }
+}
+```
+
+- **401 Unauthorized** — token missing or invalid.
+
+## Authentication — /auth/logout (protected)
+
+Clears the auth cookie and logs the user out of the session.
+
+### Endpoint
+
+- **URL**: `/auth/logout`
+- **Method**: GET
+
+### Authentication
+
+This endpoint also requires a valid token (cookie `token` or `Authorization` header). If the token is missing or invalid, the server responds with 401.
+
+### Responses
+
+- **200 OK** — logout successful. Response:
+
+```json
+{ "message": "Logout successful" }
+```
+
+- **401 Unauthorized** — if no valid token was provided.
+
+
