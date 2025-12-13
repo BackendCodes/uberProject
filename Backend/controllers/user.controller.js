@@ -6,6 +6,9 @@ const log = logger.child({ label: "user.controller.js" });
 
 // register User
 const registerUser = async (req, res) => {
+
+  console.log(req.body);
+ 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
